@@ -70,6 +70,7 @@ class LoadCountryData extends AutoLoader
 
         $this->autoload($data, $manager);
     }
+}
 ```
 
 
