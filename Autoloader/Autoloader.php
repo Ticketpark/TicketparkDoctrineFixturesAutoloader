@@ -67,8 +67,9 @@ abstract class Autoloader  extends AbstractFixture
      * </code>
      *
      * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param array $setterMethods
      */
-    protected function autoload(array $data, ObjectManager $manager)
+    protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null)
     {
         foreach($data as $item){
 
@@ -84,10 +85,18 @@ abstract class Autoloader  extends AbstractFixture
                 if (is_array($values)) {
                     //Example: turns value 'prices' into 'addPrice'
                     $func = 'add'.ucfirst(substr($key, 0, -1));
+
                 } else {
                     //Example: turns value 'event' into 'setEvent'
                     $func = 'set'.ucfirst($key);
                     $values = array($values);
+                }
+
+                // overwrite the setter method, if exists
+                if (null !== $setterMethods) {
+                    if (array_key_exists($key, $setterMethods)) {
+                        $func = $setterMethods[$key];
+                    }
                 }
 
                 if (!method_exists($entity, $func)) {
