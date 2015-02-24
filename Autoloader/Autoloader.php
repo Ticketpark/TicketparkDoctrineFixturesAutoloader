@@ -69,7 +69,7 @@ abstract class Autoloader  extends AbstractFixture
      * @param \Doctrine\Common\Persistence\ObjectManager $manager
      * @param array $setterMethods
      */
-    protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null)
+    protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
         foreach($data as $item){
 
@@ -82,7 +82,7 @@ abstract class Autoloader  extends AbstractFixture
                     continue;
                 }
 
-                if (is_array($values)) {
+                if (is_array($values) && !in_array($key, $treatAsSingle)) {
                     //Example: turns value 'prices' into 'addPrice'
                     $func = 'add'.ucfirst(substr($key, 0, -1));
 
@@ -114,15 +114,15 @@ abstract class Autoloader  extends AbstractFixture
 
             $manager->persist($entity);
 
-            //Flush after each element due to some possible EventListeners
+            //Flush after each element due to possible event listeners
             $manager->flush();
         }
     }
 
     /**
-     * Determines reference prefix
+     * Get reference prefix
      */
-    protected function getReferencePrefix()
+    public function getReferencePrefix()
     {
         if ($this->referencePrefix === null) {
 
@@ -136,9 +136,9 @@ abstract class Autoloader  extends AbstractFixture
     }
 
     /**
-     * Determines entity class
+     * Get entity class to actually load data with
      */
-    protected function getEntityClass()
+    public function getEntityClass()
     {
         if ($this->entityClass === null) {
 
