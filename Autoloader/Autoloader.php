@@ -23,7 +23,7 @@ abstract class Autoloader extends AbstractFixture
      * @var string
      *
      * The namespace of the class the data will be loaded with.
-     * If null, the reference prefix will automatically determined by the classname of the fixture loader class.
+     * If null, the reference prefix will automatically be guessed by the classname of the fixture loader class.
      * Example: Called from 'Acme\Bundle\SomeBundle\DataFixtures\ORM\LoadEventData' the entityClass will
      * become 'Acme\Bundle\SomeBundle\Entity\Event'
      */
@@ -53,16 +53,29 @@ abstract class Autoloader extends AbstractFixture
      * );
      * </code>
      *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param ObjectManager $manager
      * @param array $setterMethods
+     * @param array $treatAsSingle
      */
     protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
         foreach($data as $item){
 
             $entityClass = $this->getEntityClass();
-            $entity = new $entityClass;
 
+            if (!class_exists($entityClass)) {
+                if ($this->entityClass){
+                    throw new \Exception(sprintf('The class "%s" does not exist.', $entityClass));
+                } else {
+                    throw new \Exception(sprintf(
+                        'The class "%s" does not exist or could not be guessed correctly.
+                         You might have to define the the entity class with $this->setEntityClass() within your fixtures loader.',
+                        $entityClass
+                    ));
+                }
+            }
+
+            $entity = new $entityClass;
             foreach ($item as $key => $values) {
 
                 if ($key == '_reference') {
@@ -71,27 +84,25 @@ abstract class Autoloader extends AbstractFixture
 
                 if (is_array($values) && !in_array($key, $treatAsSingle)) {
                     //Example: turns value 'prices' into 'addPrice'
-                    $func = 'add'.ucfirst(substr($key, 0, -1));
+                    $setterMethod = 'add'.ucfirst(substr($key, 0, -1));
 
                 } else {
                     //Example: turns value 'event' into 'setEvent'
-                    $func = 'set'.ucfirst($key);
+                    $setterMethod = 'set'.ucfirst($key);
                     $values = array($values);
                 }
 
                 // overwrite the setter method, if exists
-                if (null !== $setterMethods) {
-                    if (array_key_exists($key, $setterMethods)) {
-                        $func = $setterMethods[$key];
-                    }
+                if (is_array($setterMethods) && array_key_exists($key, $setterMethods)) {
+                    $setterMethod = $setterMethods[$key];
                 }
 
-                if (!method_exists($entity, $func)) {
-                    throw new \Exception('Inexistent method: '.$entityClass.'->'.$func.'()');
+                if (!method_exists($entity, $setterMethod)) {
+                    throw new \Exception('Inexistent method: '.$entityClass.'->'.$setterMethod.'()');
                 }
 
                 foreach($values as $value){
-                    call_user_func(array($entity, $func), $value);
+                    call_user_func(array($entity, $setterMethod), $value);
                 }
             }
 
@@ -107,13 +118,28 @@ abstract class Autoloader extends AbstractFixture
     }
 
     /**
-     * Get reference prefix
+     * Set reference prefix
+     *
+     * @param $referencePrefix
+     * @return $this
      */
-    public function getReferencePrefix()
+    protected function setReferencePrefix($referencePrefix)
+    {
+        $this->referencePrefix = $referencePrefix;
+
+        return $this;
+    }
+
+    /**
+     * Get preference prefix
+     *
+     * @return string
+     */
+    protected function getReferencePrefix()
     {
         if ($this->referencePrefix === null) {
 
-            $prefix = $this->getEntityClassName();
+            $prefix = $this->getEntityName();
             $prefix = strtolower($prefix);
 
             return  $prefix.'_';
@@ -123,16 +149,29 @@ abstract class Autoloader extends AbstractFixture
     }
 
     /**
-     * Get entity class to actually load data with
+     * Set entity class
+     *
+     * @param $entityClass
+     * @return $this
      */
-    public function getEntityClass()
+    protected function setEntityClass($entityClass)
     {
-        if ($this->entityClass === null) {
+        $this->entityClass = $entityClass;
 
-            $calledClass   = get_called_class();
-            $entityClass = preg_replace('/'.preg_quote('\Load').'/', '', $calledClass);
-            $entityClass = preg_replace('/Data$/', '', $entityClass);
-            $entityClass = str_replace('DataFixtures\ORM', 'Entity\\', $entityClass);
+        return $this;
+    }
+
+    /**
+     * Get entity class
+     *
+     * @return string
+     */
+    protected function getEntityClass()
+    {
+        // Guess the entity class if it is not explicitly set
+        if ($this->entityClass === null) {
+            $reflection = new \ReflectionClass(get_called_class());
+            $entityClass = str_replace('DataFixtures\ORM', 'Entity', $reflection->getNamespaceName()) . '\\' . $this->getEntityName();
 
             return $entityClass;
         }
@@ -141,35 +180,18 @@ abstract class Autoloader extends AbstractFixture
     }
 
     /**
-     * Returns Entity class name
+     * Returns entity name
      *
      * @return string
      */
-    protected function getEntityClassName()
+    private function getEntityName()
     {
-        $classname = $this->extractClassnameFromNamespace();
-        $entityClassName = preg_replace('/^Load/', '', $classname);
-        $entityClassName = preg_replace('/Data$/', '', $entityClassName);
+        $reflection = new \ReflectionClass(get_called_class());
 
-        return $entityClassName;
-    }
+        $entityName  = $reflection->getShortName();
+        $entityName = preg_replace('/^Load/', '', $entityName);
+        $entityName = preg_replace('/Data$/', '', $entityName);
 
-    /**
-     * Extracts and returns classname from namespace string
-     *
-     * @return string
-     */
-    protected function extractClassnameFromNamespace()
-    {
-        $calledClass = get_called_class();
-
-        $parts = explode('\\', trim($calledClass));
-        $className = array_pop($parts);
-
-        if ('' == $className) {
-            return false;
-        }
-
-        return $className;
+        return $entityName;
     }
 }
