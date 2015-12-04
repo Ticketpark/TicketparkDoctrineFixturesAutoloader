@@ -66,7 +66,11 @@ abstract class Autoloader extends AbstractFixture implements FixtureInterface
 
             if (!class_exists($entityClass)) {
                 if ($this->entityClass){
-                    throw new \Exception(sprintf('The class "%s" does not exist.', $entityClass));
+                    throw new \Exception(sprintf(
+                        'The class "%s" does not exist.
+                         Maybe you misspelled it in your $this->setEntityClass() call.',
+                        $entityClass
+                    ));
                 } else {
                     throw new \Exception(sprintf(
                         'The class "%s" does not exist or could not be guessed correctly.
