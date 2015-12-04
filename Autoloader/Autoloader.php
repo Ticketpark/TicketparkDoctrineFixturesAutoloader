@@ -3,12 +3,13 @@
 namespace Ticketpark\FixturesAutoloadBundle\Autoloader;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 /**
  * Autoloader
  */
-abstract class Autoloader extends AbstractFixture
+abstract class Autoloader extends AbstractFixture implements FixtureInterface
 {
     /**
      * @var string
@@ -111,10 +112,9 @@ abstract class Autoloader extends AbstractFixture
             }
 
             $manager->persist($entity);
-
-            //Flush after each element due to possible event listeners
-            $manager->flush();
         }
+
+        $manager->flush();
     }
 
     /**
