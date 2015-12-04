@@ -11,11 +11,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 abstract class Autoloader extends AbstractFixture
 {
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * @var string
      *
      * References will be prefixed with this string.
@@ -35,16 +30,8 @@ abstract class Autoloader extends AbstractFixture
     protected $entityClass = null;
 
     /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
      * Loads fixtures from an array
-
+     *
      * @param array $data
      * Contains the data to be added to database in key => value format.
      * Expects setter/adder for key to be existent. Non-existent keys will be considered as having NULL values.
