@@ -4,7 +4,7 @@
     "description": "This bundle simplifies loading doctrine fixtures",
     "keywords": ["doctrine", "fixtures"],
     "license": "MIT",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Ticketpark contributors and others",
@@ -13,12 +13,8 @@
     ],
 
     "require": {
-        "php": ">=5.3.3"
-    },
-
-    "suggest": {
-        "doctrine/doctrine-bundle": "1.2.*",
-        "doctrine/doctrine-fixtures-bundle": "v2.2.0"
+        "php": ">=5.3.3",
+        "doctrine/data-fixtures": "^1.1"
     },
 
     "autoload": {
