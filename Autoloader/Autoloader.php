@@ -8,7 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 /**
  * Autoloader
  */
-abstract class Autoloader  extends AbstractFixture
+abstract class Autoloader extends AbstractFixture
 {
     /**
      * @var ContainerInterface
