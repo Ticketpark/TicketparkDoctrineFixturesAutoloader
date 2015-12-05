@@ -3,11 +3,12 @@
 This Symfony2 bundle ads functionalities to simplify loading Doctrine fixtures.
 
 ## Todos
-* Add unit tests
+* Provide some configuration options
+* Add tests
 
 ## Installation
 
-Add TicketparkImageBundle in your composer.json:
+Add TicketparkFixturesAutoloadBundle to your composer.json:
 
 ```js
 {
@@ -108,7 +109,7 @@ class LoadUserData extends AutoLoader implements DependentFixtureInterface
 
 
 ### Overwriting setter method names
-In some cases you might want to override the setter methods. E.q. because your method is named `addCurrency` instead of `addCurrencie` as the autoloader by default would asume. In this case, simply use the additional `setterMethods` parameter:
+In some cases you might want to override the setter methods. for instance because your method is named `addCurrency` instead of `addCurrencie` as the autoloader by default would asume. In this case, simply use the additional `setterMethods` parameter:
 
 ``` php
 <?php
@@ -135,6 +136,37 @@ class LoadCurrencyData extends AutoLoader
         );
 
         $this->autoload($data, $manager, $setterMethods);
+    }
+}
+```
+
+### Treat arrays as singles
+Another option to treat an array like a single element and inject the full array into a setter is by using the `$treatAsSingle` method parameter.
+
+``` php
+<?php
+
+namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
+
+use Doctrine\Common\Persistence\ObjectManager;
+use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
+
+class LoadCurrencyData extends AutoLoader
+{
+    public function load(ObjectManager $manager)
+    {
+        $data = array(
+            array(
+                'currencies' => array(
+                    'USD', 'EUR', 'CHF'
+                )
+            ),
+        );
+
+        // this will cause a call to setCurrencies() with
+        // the full currencies array
+        $treatAsSingles = array('currencies');
+        $this->autoload($data, $manager, array(), $treatAsSingles);
     }
 }
 ```
