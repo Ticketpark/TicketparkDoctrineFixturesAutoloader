@@ -45,10 +45,11 @@ public function registerBundles()
 
 namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
 
-class LoadCountryData extends AutoLoader
+class LoadCountryData extends AutoLoader implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
@@ -77,11 +78,12 @@ In a second fixture class, references will be available based on the entity name
 
 namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
 
-class LoadUserData extends AutoLoader implements DependentFixtureInterface
+class LoadUserData extends AutoLoader implements FixtureInterface, DependentFixtureInterface
 {
     public function getDependencies()
     {
@@ -116,10 +118,11 @@ In some cases you might want to override the setter methods. for instance becaus
 
 namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
 
-class LoadCurrencyData extends AutoLoader
+class LoadCurrencyData extends AutoLoader implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
@@ -148,10 +151,11 @@ Another option to treat an array like a single element and inject the full array
 
 namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
 
-class LoadCurrencyData extends AutoLoader
+class LoadCurrencyData extends AutoLoader implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
@@ -163,8 +167,7 @@ class LoadCurrencyData extends AutoLoader
             ),
         );
 
-        // this will cause a call to setCurrencies() with
-        // the full currencies array
+        // this will cause a call to setCurrencies() with the full currencies array
         $treatAsSingles = array('currencies');
         $this->autoload($data, $manager, array(), $treatAsSingles);
     }
