@@ -3,13 +3,9 @@
 namespace Ticketpark\FixturesAutoloadBundle\Autoloader;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-/**
- * Autoloader
- */
-abstract class Autoloader extends AbstractFixture implements FixtureInterface
+abstract class Autoloader extends AbstractFixture
 {
     /**
      * @var string
