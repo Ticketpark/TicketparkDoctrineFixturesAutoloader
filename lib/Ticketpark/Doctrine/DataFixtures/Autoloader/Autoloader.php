@@ -1,6 +1,6 @@
 <?php
 
-namespace Ticketpark\FixturesAutoloadBundle\Autoloader;
+namespace Ticketpark\Doctrine\DataFixtures\Autoloader;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
