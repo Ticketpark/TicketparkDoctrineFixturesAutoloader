@@ -54,7 +54,7 @@ abstract class Autoloader extends AbstractFixture
      * @param array $setterMethods
      * @param array $treatAsSingle
      */
-    protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
+    public function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
         $entityClass = $this->getEntityClass();
         $referencePrefix = $this->getReferencePrefix();
@@ -124,7 +124,7 @@ abstract class Autoloader extends AbstractFixture
      * @param $referencePrefix
      * @return $this
      */
-    protected function setReferencePrefix($referencePrefix)
+    public function setReferencePrefix($referencePrefix)
     {
         $this->referencePrefix = $referencePrefix;
 
@@ -136,7 +136,7 @@ abstract class Autoloader extends AbstractFixture
      *
      * @return string
      */
-    protected function getReferencePrefix()
+    public function getReferencePrefix()
     {
         if ($this->referencePrefix === null) {
 
@@ -155,7 +155,7 @@ abstract class Autoloader extends AbstractFixture
      * @param $entityClass
      * @return $this
      */
-    protected function setEntityClass($entityClass)
+    public function setEntityClass($entityClass)
     {
         $this->entityClass = $entityClass;
 
@@ -185,7 +185,7 @@ abstract class Autoloader extends AbstractFixture
      *
      * @return string
      */
-    private function getEntityName()
+    protected function getEntityName()
     {
         $reflection = new \ReflectionClass(get_called_class());
 
