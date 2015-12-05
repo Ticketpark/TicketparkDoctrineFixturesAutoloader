@@ -56,25 +56,26 @@ abstract class Autoloader extends AbstractFixture
      */
     protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
-        foreach($data as $properties){
+        $entityClass = $this->getEntityClass();
+        $referencePrefix = $this->getReferencePrefix();
 
-            $entityClass = $this->getEntityClass();
-
-            if (!class_exists($entityClass)) {
-                if ($this->entityClass){
-                    throw new \Exception(sprintf(
-                        'The class "%s" does not exist.
+        if (!class_exists($entityClass)) {
+            if ($this->entityClass){
+                throw new \Exception(sprintf(
+                    'The class "%s" does not exist.
                          Maybe you misspelled it in your $this->setEntityClass() call.',
-                        $entityClass
-                    ));
-                } else {
-                    throw new \Exception(sprintf(
-                        'The class "%s" does not exist or could not be guessed correctly.
+                    $entityClass
+                ));
+            } else {
+                throw new \Exception(sprintf(
+                    'The class "%s" does not exist or could not be guessed correctly.
                          You might have to define the the entity class with $this->setEntityClass() within your fixtures loader.',
-                        $entityClass
-                    ));
-                }
+                    $entityClass
+                ));
             }
+        }
+
+        foreach($data as $properties){
 
             $entity = new $entityClass;
             foreach ($properties as $propertyName => $propertyValues) {
@@ -108,7 +109,7 @@ abstract class Autoloader extends AbstractFixture
             }
 
             if (isset($properties['_reference'])) {
-                $this->addReference($this->getReferencePrefix().$properties['_reference'], $entity);
+                $this->addReference($referencePrefix.$properties['_reference'], $entity);
             }
 
             $manager->persist($entity);
