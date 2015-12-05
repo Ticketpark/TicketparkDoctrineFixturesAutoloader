@@ -56,7 +56,7 @@ abstract class Autoloader extends AbstractFixture
      */
     protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
-        foreach($data as $item){
+        foreach($data as $properties){
 
             $entityClass = $this->getEntityClass();
 
@@ -77,38 +77,38 @@ abstract class Autoloader extends AbstractFixture
             }
 
             $entity = new $entityClass;
-            foreach ($item as $key => $values) {
+            foreach ($properties as $propertyName => $propertyValues) {
 
-                if ($key == '_reference') {
+                if ($propertyName == '_reference') {
                     continue;
                 }
 
-                if (is_array($values) && !in_array($key, $treatAsSingle)) {
-                    //Example: turns value 'prices' into 'addPrice'
-                    $setterMethod = 'add'.ucfirst(substr($key, 0, -1));
+                if (is_array($propertyValues) && !in_array($propertyName, $treatAsSingle)) {
+                    // Example: turns value 'prices' into 'addPrice'
+                    $setterMethod = 'add'.ucfirst(substr($propertyName, 0, -1));
 
                 } else {
-                    //Example: turns value 'event' into 'setEvent'
-                    $setterMethod = 'set'.ucfirst($key);
-                    $values = array($values);
+                    // Example: turns value 'event' into 'setEvent'
+                    $setterMethod = 'set'.ucfirst($propertyName);
+                    $propertyValues = array($propertyValues);
                 }
 
-                // overwrite the setter method, if exists
-                if (is_array($setterMethods) && array_key_exists($key, $setterMethods)) {
-                    $setterMethod = $setterMethods[$key];
+                // Override the guessed setter method name with a custom name if provided
+                if (is_array($setterMethods) && array_key_exists($propertyName, $setterMethods)) {
+                    $setterMethod = $setterMethods[$propertyName];
                 }
 
                 if (!method_exists($entity, $setterMethod)) {
                     throw new \Exception('Inexistent method: '.$entityClass.'->'.$setterMethod.'()');
                 }
 
-                foreach($values as $value){
+                foreach($propertyValues as $value){
                     call_user_func(array($entity, $setterMethod), $value);
                 }
             }
 
-            if (isset($item['_reference'])) {
-                $this->addReference($this->getReferencePrefix().$item['_reference'], $entity);
+            if (isset($properties['_reference'])) {
+                $this->addReference($this->getReferencePrefix().$properties['_reference'], $entity);
             }
 
             $manager->persist($entity);
@@ -188,7 +188,7 @@ abstract class Autoloader extends AbstractFixture
     {
         $reflection = new \ReflectionClass(get_called_class());
 
-        $entityName  = $reflection->getShortName();
+        $entityName = $reflection->getShortName();
         $entityName = preg_replace('/^Load/', '', $entityName);
         $entityName = preg_replace('/Data$/', '', $entityName);
 
