@@ -1,43 +1,19 @@
-# TicketparkFixturesAutoloadBundle
+# TicketparkDoctrineFixturesAutoloader
 
-This Symfony2 bundle ads functionalities to simplify loading Doctrine fixtures.
-
-## Todos
-* Provide some configuration options
-* Add tests
+This library functionalities to simplify loading Doctrine fixtures.
 
 ## Installation
 
-Add TicketparkFixturesAutoloadBundle to your composer.json:
+Add TicketparkDoctrineFixturesAutoloader to your composer.json:
 
 ```js
 {
     "require": {
-        "ticketpark/fixtures-autoload-bundle": "dev-master"
+        "ticketpark/doctrine-fixtures-autoloader"
     }
 }
 ```
 
-Now tell composer to download the bundle by running the command:
-
-``` bash
-$ php composer.phar update ticketpark/fixtures-autoload-bundle
-```
-
-Enable the bundle in the kernel:
-
-``` php
-<?php
-// app/AppKernel.php
-
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Ticketpark\FixturesAutoloadBundle\TicketparkFixturesAutoloadBundle(),
-    );
-}
-```
 ## Usage
 
 ``` php
@@ -47,7 +23,7 @@ namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
+use Ticketpark\Doctrine\DataFixtures\Autoloader\Autoloader;
 
 class LoadCountryData extends AutoLoader implements FixtureInterface
 {
@@ -81,7 +57,7 @@ namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
+use Ticketpark\Doctrine\DataFixtures\Autoloader\Autoloader;
 
 class LoadUserData extends AutoLoader implements FixtureInterface, DependentFixtureInterface
 {
@@ -120,7 +96,7 @@ namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
+use Ticketpark\Doctrine\DataFixtures\Autoloader\Autoloader;
 
 class LoadCurrencyData extends AutoLoader implements FixtureInterface
 {
@@ -153,7 +129,7 @@ namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Ticketpark\FixturesAutoloadBundle\Autoloader\Autoloader;
+use Ticketpark\Doctrine\DataFixtures\Autoloader\Autoloader;
 
 class LoadCurrencyData extends AutoLoader implements FixtureInterface
 {
@@ -170,6 +146,34 @@ class LoadCurrencyData extends AutoLoader implements FixtureInterface
         // this will cause a call to setCurrencies() with the full currencies array
         $treatAsSingles = array('currencies');
         $this->autoload($data, $manager, array(), $treatAsSingles);
+    }
+}
+```
+
+### Provide class name
+By default, the library tries to guess your entity namespace based on standard data fixture naming conventions. However, you can also define the namespace of your entity manually:
+
+``` php
+<?php
+
+namespace Acme\Bundle\SomeBundle\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\FixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+use Ticketpark\Doctrine\DataFixtures\Autoloader\Autoloader;
+
+class LoadCountryData extends AutoLoader implements FixtureInterface
+{
+    public function load(ObjectManager $manager)
+    {
+        $data = array(
+            array(
+                'shortCode'     => 'CH',
+                'name'          => 'Switzerland'
+            ),
+        );
+        $this->setEntityClass('My\Custom\Namespace\Country');
+        $this->autoload($data, $manager);
     }
 }
 ```
