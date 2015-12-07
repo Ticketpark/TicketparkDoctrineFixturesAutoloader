@@ -1,6 +1,6 @@
 <?php
 
-namespace Ticketpark\FixturesAutoloadBundle\Autoloader;
+namespace Ticketpark\Doctrine\DataFixtures\Autoloader;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -54,67 +54,71 @@ abstract class Autoloader extends AbstractFixture
      * @param array $setterMethods
      * @param array $treatAsSingle
      */
-    protected function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
+    public function autoload(array $data, ObjectManager $manager, array $setterMethods = null, array $treatAsSingle = array())
     {
-        foreach($data as $item){
+        $entityClass = $this->getEntityClass();
+        $referencePrefix = $this->getReferencePrefix();
 
-            $entityClass = $this->getEntityClass();
-
-            if (!class_exists($entityClass)) {
-                if ($this->entityClass){
-                    throw new \Exception(sprintf(
-                        'The class "%s" does not exist.
-                         Maybe you misspelled it in your $this->setEntityClass() call.',
-                        $entityClass
-                    ));
-                } else {
-                    throw new \Exception(sprintf(
-                        'The class "%s" does not exist or could not be guessed correctly.
-                         You might have to define the the entity class with $this->setEntityClass() within your fixtures loader.',
-                        $entityClass
-                    ));
-                }
+        if (!class_exists($entityClass)) {
+            if ($this->entityClass){
+                throw new \Exception(sprintf(
+                    'The class "%s" does not exist. Maybe you misspelled it in your setEntityClass() call.',
+                    $entityClass
+                ));
+            } else {
+                throw new \Exception(sprintf(
+                    'The class "%s" does not exist or could not be guessed correctly. You might have to define the the entity class with setEntityClass().',
+                    $entityClass
+                ));
             }
+        }
+
+        $needsFlush = false;
+        foreach($data as $properties){
 
             $entity = new $entityClass;
-            foreach ($item as $key => $values) {
+            foreach ($properties as $propertyName => $propertyValues) {
 
-                if ($key == '_reference') {
+                if ($propertyName == '_reference') {
                     continue;
                 }
 
-                if (is_array($values) && !in_array($key, $treatAsSingle)) {
-                    //Example: turns value 'prices' into 'addPrice'
-                    $setterMethod = 'add'.ucfirst(substr($key, 0, -1));
+                if (is_array($propertyValues) && !in_array($propertyName, $treatAsSingle)) {
+                    // Example: turns value 'prices' into 'addPrice'
+                    $setterMethod = 'add'.ucfirst(substr($propertyName, 0, -1));
 
                 } else {
-                    //Example: turns value 'event' into 'setEvent'
-                    $setterMethod = 'set'.ucfirst($key);
-                    $values = array($values);
+                    // Example: turns value 'event' into 'setEvent'
+                    $setterMethod = 'set'.ucfirst($propertyName);
+                    $propertyValues = array($propertyValues);
                 }
 
-                // overwrite the setter method, if exists
-                if (is_array($setterMethods) && array_key_exists($key, $setterMethods)) {
-                    $setterMethod = $setterMethods[$key];
+                // Override the guessed setter method name with a custom name if provided
+                if (is_array($setterMethods) && array_key_exists($propertyName, $setterMethods)) {
+                    $setterMethod = $setterMethods[$propertyName];
                 }
 
                 if (!method_exists($entity, $setterMethod)) {
                     throw new \Exception('Inexistent method: '.$entityClass.'->'.$setterMethod.'()');
                 }
 
-                foreach($values as $value){
+                foreach($propertyValues as $value){
                     call_user_func(array($entity, $setterMethod), $value);
                 }
             }
 
-            if (isset($item['_reference'])) {
-                $this->addReference($this->getReferencePrefix().$item['_reference'], $entity);
+            if (isset($properties['_reference'])) {
+                $this->addReference($referencePrefix.$properties['_reference'], $entity);
             }
 
             $manager->persist($entity);
+            $needsFlush = true;
         }
 
-        $manager->flush();
+        if ($needsFlush) {
+            $manager->flush();
+        }
+
     }
 
     /**
@@ -123,7 +127,7 @@ abstract class Autoloader extends AbstractFixture
      * @param $referencePrefix
      * @return $this
      */
-    protected function setReferencePrefix($referencePrefix)
+    public function setReferencePrefix($referencePrefix)
     {
         $this->referencePrefix = $referencePrefix;
 
@@ -135,7 +139,7 @@ abstract class Autoloader extends AbstractFixture
      *
      * @return string
      */
-    protected function getReferencePrefix()
+    public function getReferencePrefix()
     {
         if ($this->referencePrefix === null) {
 
@@ -154,7 +158,7 @@ abstract class Autoloader extends AbstractFixture
      * @param $entityClass
      * @return $this
      */
-    protected function setEntityClass($entityClass)
+    public function setEntityClass($entityClass)
     {
         $this->entityClass = $entityClass;
 
@@ -184,11 +188,11 @@ abstract class Autoloader extends AbstractFixture
      *
      * @return string
      */
-    private function getEntityName()
+    protected function getEntityName()
     {
         $reflection = new \ReflectionClass(get_called_class());
 
-        $entityName  = $reflection->getShortName();
+        $entityName = $reflection->getShortName();
         $entityName = preg_replace('/^Load/', '', $entityName);
         $entityName = preg_replace('/Data$/', '', $entityName);
 

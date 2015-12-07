@@ -1,8 +1,8 @@
 {
-    "name": "ticketpark/fixtures-autoload-bundle",
-    "type": "symfony-bundle",
-    "description": "This bundle simplifies loading doctrine fixtures",
-    "keywords": ["doctrine", "fixtures"],
+    "name": "ticketpark/doctrine-fixtures-autoloader",
+    "type": "library",
+    "description": "Simplifies loading doctrine fixtures",
+    "keywords": ["doctrine", "fixtures", "database"],
     "license": "MIT",
     "minimum-stability": "stable",
     "authors": [
@@ -18,8 +18,11 @@
     },
 
     "autoload": {
-        "psr-0": { "Ticketpark\\FixturesAutoloadBundle": "" }
+        "psr-4": { "Ticketpark\\Doctrine\\": "lib/Ticketpark/Doctrine" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Ticketpark\\Tests\\": "tests/Ticketpark" }
     },
 
-    "target-dir": "Ticketpark/FixturesAutoloadBundle"
+    "target-dir": "Ticketpark/DoctrineFixturesAutoloader"
 }
