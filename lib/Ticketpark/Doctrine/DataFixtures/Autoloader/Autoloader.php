@@ -62,19 +62,18 @@ abstract class Autoloader extends AbstractFixture
         if (!class_exists($entityClass)) {
             if ($this->entityClass){
                 throw new \Exception(sprintf(
-                    'The class "%s" does not exist.
-                         Maybe you misspelled it in your $this->setEntityClass() call.',
+                    'The class "%s" does not exist. Maybe you misspelled it in your setEntityClass() call.',
                     $entityClass
                 ));
             } else {
                 throw new \Exception(sprintf(
-                    'The class "%s" does not exist or could not be guessed correctly.
-                         You might have to define the the entity class with $this->setEntityClass() within your fixtures loader.',
+                    'The class "%s" does not exist or could not be guessed correctly. You might have to define the the entity class with setEntityClass().',
                     $entityClass
                 ));
             }
         }
 
+        $needsFlush = false;
         foreach($data as $properties){
 
             $entity = new $entityClass;
@@ -113,9 +112,13 @@ abstract class Autoloader extends AbstractFixture
             }
 
             $manager->persist($entity);
+            $needsFlush = true;
         }
 
-        $manager->flush();
+        if ($needsFlush) {
+            $manager->flush();
+        }
+
     }
 
     /**

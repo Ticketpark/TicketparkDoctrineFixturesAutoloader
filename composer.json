@@ -2,7 +2,7 @@
     "name": "ticketpark/doctrine-fixtures-autoloader",
     "type": "library",
     "description": "Simplifies loading doctrine fixtures",
-    "keywords": ["doctrine", "fixtures"],
+    "keywords": ["doctrine", "fixtures", "database"],
     "license": "MIT",
     "minimum-stability": "stable",
     "authors": [
@@ -18,8 +18,11 @@
     },
 
     "autoload": {
-        "psr-0": { "Ticketpark\\Doctrine\\DataFixtures\\Autoloader": "lib" }
+        "psr-4": { "Ticketpark\\Doctrine\\": "lib/Ticketpark/Doctrine" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Ticketpark\\Tests\\": "tests/Ticketpark" }
     },
 
-    "target-dir": "Ticketpark/DoctrineFixturesAutoloaders"
+    "target-dir": "Ticketpark/DoctrineFixturesAutoloader"
 }
