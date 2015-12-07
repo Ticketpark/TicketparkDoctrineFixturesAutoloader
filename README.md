@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Ticketpark/TicketparkDoctrineFixturesAutoloader.svg?branch=master)](https://travis-ci.org/Ticketpark/TicketparkDoctrineFixturesAutoloader)
 
-This library functionalities to simplify loading Doctrine fixtures.
+This library simplifies loading Doctrine fixtures.
 
 ## Installation
 
