@@ -22,7 +22,5 @@
     },
     "autoload-dev": {
         "psr-4": { "Ticketpark\\Tests\\": "tests/Ticketpark" }
-    },
-
-    "target-dir": "Ticketpark/DoctrineFixturesAutoloader"
+    }
 }
