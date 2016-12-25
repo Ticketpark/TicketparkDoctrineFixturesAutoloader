@@ -15,7 +15,8 @@ class AutoloaderTest extends \PHPUnit_Framework_TestCase
                 'roles'      => array('foo'),
                 'currencies' => array('CHF', 'EUR'),
                 'friends'    => array('Anna', 'Ben'),
-                'pets'       => array('Dog', 'Cat', 'Fish')
+                'pets'       => array('Dog', 'Cat', 'Fish'),
+                'magic'      => 'foo'
             ),
             array(
                 'name' => 'Bar',

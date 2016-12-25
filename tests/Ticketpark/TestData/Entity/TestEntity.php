@@ -13,4 +13,6 @@ class TestEntity
     public function customNewFriendSetter($friend){}
 
     public function setPets(array $pets){}
+
+    public function __call($method, $params){}
 }

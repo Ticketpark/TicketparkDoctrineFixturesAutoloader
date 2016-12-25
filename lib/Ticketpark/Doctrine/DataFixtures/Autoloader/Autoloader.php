@@ -98,12 +98,12 @@ abstract class Autoloader extends AbstractFixture
                     $setterMethod = $setterMethods[$propertyName];
                 }
 
-                if (!method_exists($entity, $setterMethod)) {
+                if (!is_callable(array($entity, $setterMethod))) {
                     throw new \Exception('Inexistent method: '.$entityClass.'->'.$setterMethod.'()');
                 }
 
                 foreach($propertyValues as $value){
-                    call_user_func(array($entity, $setterMethod), $value);
+                    $entity->$setterMethod($value);
                 }
             }
 
