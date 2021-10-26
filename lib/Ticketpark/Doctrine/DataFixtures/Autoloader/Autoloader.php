@@ -2,10 +2,10 @@
 
 namespace Ticketpark\Doctrine\DataFixtures\Autoloader;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-abstract class Autoloader extends AbstractFixture
+abstract class Autoloader extends Fixture
 {
     /**
      * @var string
