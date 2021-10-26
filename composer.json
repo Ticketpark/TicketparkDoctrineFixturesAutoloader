@@ -13,8 +13,8 @@
     ],
 
     "require": {
-        "php": ">=5.3.3",
-        "doctrine/data-fixtures": "^1.1"
+        "php": "^7.1 || ^8.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.4"
     },
 
     "require-dev": {
